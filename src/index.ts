@@ -4,14 +4,30 @@ import msRestAzure, { MSIAppServiceTokenCredentials } from 'ms-rest-azure';
 type SecretValue = string;
 type GetSecret<T extends string, S extends string> = (
   namespace: T,
-  key: S
+  key: S,
+  usingCache?: boolean
 ) => Promise<SecretValue>;
 type KeyVaultUrls<T extends string> = { [K in T]: string };
 
 interface IClientOptions<T extends string> {
+  useCache?: boolean;
   client?: () => Promise<KeyVaultClient>;
   urls: KeyVaultUrls<T>;
   useVault?: boolean;
+}
+
+function getCacheClient() {
+  const cache: Record<string, string | undefined> = {};
+  const makeKey = (ns: string, key: string) => `${ns}_${key}`;
+
+  return {
+    get(ns: string, key: string) {
+      return cache[makeKey(ns, key)];
+    },
+    set(ns: string, key: string, value: string) {
+      cache[makeKey(ns, key)] = value;
+    },
+  };
 }
 
 function validateKeyVaultUrl(url: string) {
@@ -29,6 +45,7 @@ function validateOptions<T extends string>(options: IClientOptions<T>) {
     urls,
     client = getVaultClient,
     useVault = Boolean(process.env.APPSETTING_WEBSITE_SITE_NAME),
+    useCache = false,
   } = options;
 
   if (typeof client !== 'function') {
@@ -52,6 +69,7 @@ function validateOptions<T extends string>(options: IClientOptions<T>) {
 
   return {
     client,
+    useCache,
     useVault,
     urls: validatedUrls,
   };
@@ -70,59 +88,81 @@ const getVaultClient = () => {
 };
 
 const envRetreiver = <T extends string, S extends string>(
-  keyVaultUrls: KeyVaultUrls<T>
-): GetSecret<T, S> => async (namespace: T, key: S) => {
-  const fullKey = `${namespace.toUpperCase()}_${key}`;
-  const secret = process.env[fullKey];
+  keyVaultUrls: KeyVaultUrls<T>,
+  isClientCached: boolean
+): GetSecret<T, S> => {
+  const cache = getCacheClient();
 
-  if (typeof secret === 'undefined') {
-    throw new Error(
-      `${fullKey} is not defined. Please provide it on your .env file`
-    );
-  }
+  return async (namespace, key, useCache = isClientCached) => {
+    const cached = cache.get(namespace, key);
+    if (useCache && cached) {
+      return cached;
+    }
 
-  return secret;
+    const fullKey = `${namespace.toUpperCase()}_${key}`;
+    const secret = process.env[fullKey];
+
+    if (typeof secret === 'undefined') {
+      throw new Error(
+        `${fullKey} is not defined. Please provide it on your .env file`
+      );
+    }
+
+    cache.set(namespace, key, secret);
+
+    return secret;
+  };
 };
 
 const keyVaultRetreiver = <T extends string, S extends string>(
   vaultClient: () => Promise<KeyVaultClient>,
-  keyVaultUrls: KeyVaultUrls<T>
+  keyVaultUrls: KeyVaultUrls<T>,
+  isClientCached: boolean
 ): GetSecret<T, S> => {
+  const cache = getCacheClient();
   const client = vaultClient();
 
-  return async (namespace, key) => {
+  return async (namespace, key, useCache = isClientCached) => {
     if (!Object.prototype.hasOwnProperty.call(keyVaultUrls, namespace)) {
       throw new Error(
         `The namespace ${namespace} is not defined on the client.`
       );
     }
 
+    const cached = cache.get(namespace, key);
+
+    if (useCache && cached) {
+      return cached;
+    }
+
     // KeyVault only supports  alphanumeric characters and dashes, so we have to convert the
     // underscores to make it work for both ENV variables and this.
     const formattedKey = key.replace(/_/g, '-');
     const keyVaultUrl = keyVaultUrls[namespace];
-    const secretBundle = await (await client).getSecret(
+    const { value } = await (await client).getSecret(
       keyVaultUrl,
       formattedKey,
       ''
     );
 
-    if (!secretBundle.value) {
+    if (!value) {
       throw new Error(
         `${formattedKey} does not exist in keyvault with url ${keyVaultUrl}`
       );
     }
 
-    return secretBundle.value;
+    cache.set(namespace, key, value);
+
+    return value;
   };
 };
 
 export const createClient = <T extends string, S extends string>(
   options: IClientOptions<T>
 ) => {
-  const { urls, client, useVault } = validateOptions(options);
+  const { client, urls, useCache, useVault } = validateOptions(options);
 
   return useVault
-    ? keyVaultRetreiver<T, S>(client, urls)
-    : envRetreiver<T, S>(urls);
+    ? keyVaultRetreiver<T, S>(client, urls, useCache)
+    : envRetreiver<T, S>(urls, useCache);
 };

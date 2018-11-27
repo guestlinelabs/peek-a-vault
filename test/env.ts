@@ -11,23 +11,43 @@ const mockKeyVaultClient: Partial<KeyVaultClient> = {
     return { value: 'secretValue' };
   },
 };
-const envClient = createClient({
-  client: async () => mockKeyVaultClient as KeyVaultClient,
-  useVault: false,
-  urls: {
-    NS1: 'http://www.vault.com',
-  },
+const getMockClient = (useCache: boolean) =>
+  createClient({
+    client: async () => mockKeyVaultClient as KeyVaultClient,
+    useCache,
+    useVault: false,
+    urls: {
+      NS1: 'http://www.vault.com',
+    },
+  });
+
+const normalClient = getMockClient(false);
+const cachedClient = getMockClient(true);
+
+test.beforeEach(t => {
+  process.env.NS1_TEST = 'ENV-NS1-VALUE';
 });
 
-process.env.NS1_TEST = 'ENV-NS1-VALUE';
-
 test('gets the key from env', async t => {
-  const bar = Promise.resolve('bar');
-  t.is(await envClient('NS1', 'TEST'), 'ENV-NS1-VALUE');
+  t.is(await normalClient('NS1', 'TEST'), 'ENV-NS1-VALUE');
+  process.env.NS1_TEST = 'ENV-NS1-NEWVALUE';
+  t.is(await normalClient('NS1', 'TEST'), 'ENV-NS1-NEWVALUE');
+});
+
+test('gets same key even if it changes when the client is cached', async t => {
+  t.is(await cachedClient('NS1', 'TEST'), 'ENV-NS1-VALUE');
+  process.env.NS1_TEST = 'ENV-NS1-NEWVALUE';
+  t.is(await cachedClient('NS1', 'TEST'), 'ENV-NS1-VALUE');
+});
+
+test('bypasses the cache rule on an individual level', async t => {
+  t.is(await cachedClient('NS1', 'TEST'), 'ENV-NS1-VALUE');
+  process.env.NS1_TEST = 'ENV-NS1-NEWVALUE';
+  t.is(await cachedClient('NS1', 'TEST', false), 'ENV-NS1-NEWVALUE');
 });
 
 test('throws when the key does not exist', async t => {
   await t.throwsAsync(async () => {
-    await envClient('NS1', 'NOT_EXISTING');
+    await normalClient('NS1', 'NOT_EXISTING');
   });
 });
