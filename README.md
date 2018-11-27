@@ -29,6 +29,8 @@ import { createClient } from '@guestlinelabs/peek-a-vault';
 const getSecret = createClient({
   // [OPTIONAL] A function that will return a promise with your own Key Vault client. By default it will use a KV client authenticating with MSI.
   client: async () => keyVaultClient;
+  // [OPTIONAL] To cache by default all retreivals of secrets.
+  useCache: false,
   // [OPTIONAL] To use key vault client or read from process.env.
   useVault: Boolean(process.env.APPSETTING_WEBSITE_SITE_NAME),
   // List of namespaces with the KeyVault url associated.
@@ -46,6 +48,7 @@ async function main() {
   );
   // In local environment it will retrieve NS2_SENDGRID_KEY from process.env variables
   // Inside a WebApp it will retrieve SENDGRID-KEY from the NS1 keyvault
-  const emailClient = new EmailClient(await getSecret('NS2', 'SENDGRID_KEY'));
+  // The third parameter will explicitly tell if we want to use the cache or not on this particular call.
+  const emailClient = new EmailClient(await getSecret('NS2', 'SENDGRID_KEY', false));
 }
 ```
