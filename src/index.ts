@@ -33,7 +33,11 @@ function getCacheClient() {
 function validateKeyVaultUrl(url: string) {
   // The KeyVaultClient has a bug where it will crash if you pass an url with a trailing slash
   // https://github.com/Azure/azure-sdk-for-node/issues/2380
-  return new URL(url).href.replace(/\/$/, '');
+  try {
+    return new URL(url).href.replace(/\/$/, '');
+  } catch (err) {
+    throw new TypeError(`The url ${url} is not valid.`);
+  }
 }
 
 function validateOptions<T extends string>(options: IClientOptions<T>) {
