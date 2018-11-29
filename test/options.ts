@@ -19,15 +19,18 @@ test('throws if the urls parameter is empty', async t => {
   });
 });
 
-test('throws if a url passed is not a valid uri', async t => {
-  await t.throwsAsync(async () => {
-    await createClient({
-      urls: {
-        NS1: 'http://www.ns1-vault.com',
-        NS2: 'notvaliduri',
-      },
-    });
-  });
+test('throws if a url passed is not a valid uri specifying the url passed', async t => {
+  await t.throwsAsync(
+    async () => {
+      await createClient({
+        urls: {
+          NS1: 'http://www.ns1-vault.com',
+          NS2: 'notvaliduri',
+        },
+      });
+    },
+    { instanceOf: TypeError, message: 'The url notvaliduri is not valid.' }
+  );
 });
 
 test('throws if the client parameter is not a function', async t => {
