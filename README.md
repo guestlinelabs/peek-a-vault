@@ -1,7 +1,7 @@
 # peek-a-vault
 
 [![npm version](https://img.shields.io/npm/v/@guestlinelabs/peek-a-vault.svg?style=flat-square)](https://www.npmjs.org/package/@guestlinelabs/peek-a-vault)
-
+[![Build Status](https://dev.azure.com/openguestlinelabs/Jabbascript/_apis/build/status/guestlinelabs.peek-a-vault)](https://dev.azure.com/openguestlinelabs/Jabbascript/_build/latest?definitionId=2)
 [![npm downloads](https://img.shields.io/npm/dm/@guestlinelabs/peek-a-vault.svg?style=flat-square)](http://npm-stat.com/charts.html?package=@guestlinelabs/peek-a-vault)
 
 A small library to retreive secrets from different [Key Vaults](https://azure.microsoft.com/en-gb/services/key-vault/) on App Services using [MSI](https://docs.microsoft.com/en-gb/azure/app-service/app-service-managed-service-identity) authentication.
