@@ -1,6 +1,6 @@
 {
   "name": "@guestlinelabs/peek-a-vault",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Client handler for getting secrets from Key Vault with a local fallback",
   "main": "dist/index.js",
   "scripts": {
@@ -40,7 +40,7 @@
   "devDependencies": {
     "ava": "1.0.0-rc.2",
     "nyc": "13.1.0",
-    "prettier": "1.15.2",
+    "prettier": "1.15.3",
     "rimraf": "2.6.2",
     "source-map-support": "0.5.9",
     "ts-node": "7.0.1",
@@ -48,7 +48,7 @@
     "tslint-config-prettier": "1.17.0",
     "tslint-plugin-ava": "0.1.2",
     "tslint-plugin-prettier": "2.0.1",
-    "typescript": "3.1.6"
+    "typescript": "3.2.1"
   },
   "dependencies": {
     "azure-keyvault": "3.0.4",
