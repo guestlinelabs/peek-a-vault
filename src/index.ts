@@ -1,5 +1,6 @@
 import { KeyVaultClient } from 'azure-keyvault';
 import msRestAzure, { MSIAppServiceTokenCredentials } from 'ms-rest-azure';
+import { URL } from 'url';
 
 type SecretValue = string;
 type GetSecret<T extends string, S extends string> = (
