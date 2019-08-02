@@ -1,3 +1,9 @@
+## 0.1.4 (August 2, 2019)
+
+#### :house: Internal
+
+- [#5](https://github.com/guestlinelabs/peek-a-vault/pull/5) Update node dependencies to solve vulnerabilities issues.
+
 ## 0.1.3 (June 29, 2019)
 
 #### :house: Internal
