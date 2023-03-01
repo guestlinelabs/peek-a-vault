@@ -6,7 +6,7 @@
   "scripts": {
     "prebuild": "rimraf dist",
     "build": "tsc -p tsconfig.build.json",
-    "lint": "tslint -c tslint.json 'src/**/*.ts' 'test/**/*.ts'",
+    "lint": "eslint -c .eslintrc.json src/** test/**",
     "prepare": "npm run build",
     "test": "nyc ava",
     "test:watch": "ava --watch",
@@ -37,6 +37,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@typescript-eslint/eslint-plugin": "^5.54.0",
+    "@typescript-eslint/parser": "^5.54.0",
     "ava": "^5.2.0",
     "eslint": "^8.35.0",
     "eslint-config-prettier": "^8.6.0",

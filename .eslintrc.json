@@ -1,0 +1,19 @@
+{
+    "root": true,
+    "parser": "@typescript-eslint/parser",
+    "extends": [
+        "eslint:recommended",
+        "plugin:@typescript-eslint/recommended",
+        "eslint-config-prettier",
+        "plugin:ava/recommended"
+    ],
+    "plugins": [
+        "prettier",
+        "ava",
+        "@typescript-eslint"
+    ],
+    "rules": {
+        "prettier/prettier": "error",
+        "object-literal-sort-keys": 0
+    }
+}
