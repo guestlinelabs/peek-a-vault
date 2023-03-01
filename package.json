@@ -1,6 +1,6 @@
 {
   "name": "@guestlinelabs/peek-a-vault",
-  "version": "0.1.4",
+  "version": "1.0.0",
   "description": "Client handler for getting secrets from Key Vault with a local fallback",
   "main": "dist/index.js",
   "scripts": {
