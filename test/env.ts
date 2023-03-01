@@ -24,29 +24,29 @@ const getMockClient = (useCache: boolean) =>
 const normalClient = getMockClient(false);
 const cachedClient = getMockClient(true);
 
-test.beforeEach(t => {
+test.beforeEach((t) => {
   process.env.NS1_TEST = 'ENV-NS1-VALUE';
 });
 
-test('gets the key from env', async t => {
+test('gets the key from env', async (t) => {
   t.is(await normalClient('NS1', 'TEST'), 'ENV-NS1-VALUE');
   process.env.NS1_TEST = 'ENV-NS1-NEWVALUE';
   t.is(await normalClient('NS1', 'TEST'), 'ENV-NS1-NEWVALUE');
 });
 
-test('gets same key even if it changes when the client is cached', async t => {
+test('gets same key even if it changes when the client is cached', async (t) => {
   t.is(await cachedClient('NS1', 'TEST'), 'ENV-NS1-VALUE');
   process.env.NS1_TEST = 'ENV-NS1-NEWVALUE';
   t.is(await cachedClient('NS1', 'TEST'), 'ENV-NS1-VALUE');
 });
 
-test('bypasses the cache rule on an individual level', async t => {
+test('bypasses the cache rule on an individual level', async (t) => {
   t.is(await cachedClient('NS1', 'TEST'), 'ENV-NS1-VALUE');
   process.env.NS1_TEST = 'ENV-NS1-NEWVALUE';
   t.is(await cachedClient('NS1', 'TEST', false), 'ENV-NS1-NEWVALUE');
 });
 
-test('throws when the key does not exist', async t => {
+test('throws when the key does not exist', async (t) => {
   await t.throwsAsync(async () => {
     await normalClient('NS1', 'NOT_EXISTING');
   });

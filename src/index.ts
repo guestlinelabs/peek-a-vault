@@ -89,7 +89,7 @@ const getVaultClient = () => {
     .loginWithAppServiceMSI({
       resource: 'https://vault.azure.net',
     } as MSIAppServiceTokenCredentials)
-    .then(credentials => new KeyVaultClient(credentials));
+    .then((credentials) => new KeyVaultClient(credentials));
 };
 
 const envRetreiver = <T extends string, S extends string>(
@@ -144,11 +144,9 @@ const keyVaultRetreiver = <T extends string, S extends string>(
     // underscores to make it work for both ENV variables and this.
     const formattedKey = key.replace(/_/g, '-');
     const keyVaultUrl = keyVaultUrls[namespace];
-    const { value } = await (await client).getSecret(
-      keyVaultUrl,
-      formattedKey,
-      ''
-    );
+    const { value } = await (
+      await client
+    ).getSecret(keyVaultUrl, formattedKey, '');
 
     if (!value) {
       throw new Error(
