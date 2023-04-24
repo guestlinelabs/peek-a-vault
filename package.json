@@ -1,6 +1,6 @@
 {
   "name": "@guestlinelabs/peek-a-vault",
-  "version": "1.0.0",
+  "version": "0.1.5",
   "description": "Client handler for getting secrets from Key Vault with a local fallback",
   "main": "dist/index.js",
   "scripts": {
@@ -53,6 +53,6 @@
   },
   "dependencies": {
     "azure-keyvault": "^3.0.5",
-    "ms-rest-azure": "^3.0.2"
+    "ms-rest-azure": "^2.5.7"
   }
 }
