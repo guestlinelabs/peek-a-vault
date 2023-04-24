@@ -88,7 +88,7 @@ const getVaultClient = () => {
   return msRestAzure
     .loginWithAppServiceMSI({
       resource: 'https://vault.azure.net',
-    } as MSIAppServiceTokenCredentials)
+    })
     .then((credentials) => new KeyVaultClient(credentials));
 };
 
